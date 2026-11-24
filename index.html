@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>XVIII COT - Comando de Operações Táticas | Preparação Física</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            tactical: {
+              950: '#090b0e',
+              900: '#101419',
+              850: '#161b22',
+              800: '#1e252e',
+              700: '#2c3643',
+              olive: '#4d7c0f',
+              oliveLight: '#84cc16',
+              amber: '#d97706',
+              amberLight: '#fbbf24',
+              cyan: '#0284c7',
+              cyanLight: '#38bdf8'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #101419; }
+    ::-webkit-scrollbar-thumb { background: #2c3643; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #4d7c0f; }
+    .tab-active {
+      border-bottom: 2px solid #fbbf24;
+      color: #fbbf24;
+      background: rgba(251, 191, 36, 0.08);
+    }
+  </style>
+</head>
+<body class="bg-tactical-950 text-slate-100 font-sans antialiased min-h-screen flex flex-col">
+
+  <!-- TOP HEADER TÁTICO -->
+  <header class="bg-tactical-900 border-b border-tactical-700 sticky top-0 z-40 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500/20 to-lime-600/20 border border-amber-500/40 flex items-center justify-center shrink-0">
+            <!-- Ícone Escudo Tático SVG -->
+            <svg class="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 2l7 4v6c0 5.25-3.5 9.74-7 11-3.5-1.26-7-5.75-7-11V6l7-4z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4"/>
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-white">OPERADOR TÁTICO • XVIII COT/PF</h1>
+              <span class="px-2 py-0.5 text-[11px] font-mono font-bold uppercase rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">Portaria 758/2024</span>
+            </div>
+            <p class="text-xs text-slate-400">Periodização Integrada (TAF + Curso) • <span class="text-slate-200 font-medium">24/11/2026 a 01/07/2027 (31 Semanas / 220 Dias)</span></p>
+          </div>
+        </div>
+
+        <!-- KPIs Rápidos no Topo -->
+        <div class="grid grid-cols-3 gap-2 sm:gap-4 bg-tactical-850 p-2 rounded-xl border border-tactical-700">
+          <div class="px-2 text-center border-r border-tactical-700">
+            <div class="text-[10px] uppercase tracking-wider text-slate-400">Treinos Concluídos</div>
+            <div id="header-completed-count" class="text-sm sm:text-base font-mono font-bold text-lime-400">0 / 220</div>
+          </div>
+          <div class="px-2 text-center border-r border-tactical-700">
+            <div class="text-[10px] uppercase tracking-wider text-slate-400">Progresso Geral</div>
+            <div id="header-progress-pct" class="text-sm sm:text-base font-mono font-bold text-amber-400">0.0%</div>
+          </div>
+          <div class="px-2 text-center">
+            <div class="text-[10px] uppercase tracking-wider text-slate-400">Alvo Final</div>
+            <div class="text-sm sm:text-base font-mono font-bold text-sky-400">01/07/2027</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navegação por Abas -->
+      <nav class="flex overflow-x-auto gap-1 mt-3 pt-2 border-t border-tactical-800 text-xs sm:text-sm font-semibold">
+        <button onclick="switchTab('calendario')" id="tab-btn-calendario" class="tab-active px-3 sm:px-4 py-2 rounded-t-lg whitespace-nowrap transition flex items-center gap-1.5">
+          <span>📅</span> Planilha Diária (220 Dias)
+        </button>
+        <button onclick="switchTab('metas')" id="tab-btn-metas" class="px-3 sm:px-4 py-2 rounded-t-lg text-slate-400 hover:text-white whitespace-nowrap transition flex items-center gap-1.5">
+          <span>🎯</span> Simulador TAF & Índices Curso
+        </button>
+        <button onclick="switchTab('cronometro')" id="tab-btn-cronometro" class="px-3 sm:px-4 py-2 rounded-t-lg text-slate-400 hover:text-white whitespace-nowrap transition flex items-center gap-1.5">
+          <span>⏱️</span> Timer Apneia (CO₂/O₂) & Flutuação
+        </button>
+        <button onclick="switchTab('evolucao')" id="tab-btn-evolucao" class="px-3 sm:px-4 py-2 rounded-t-lg text-slate-400 hover:text-white whitespace-nowrap transition flex items-center gap-1.5">
+          <span>📈</span> Periodização & Gráficos
+        </button>
+        <button onclick="switchTab('diretrizes')" id="tab-btn-diretrizes" class="px-3 sm:px-4 py-2 rounded-t-lg text-slate-400 hover:text-white whitespace-nowrap transition flex items-center gap-1.5">
+          <span>🛡️</span> Protocolo Fisiológico & Prevenção
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- ========================================================= -->
+    <!-- ABA 1: CALENDÁRIO DIÁRIO INTERATIVO (24/11/2026-01/07/2027) -->
+    <!-- ========================================================= -->
+    <section id="view-calendario" class="space-y-6">
+      
+      <!-- Barra de Controle de Semana e Mesociclo -->
+      <div class="bg-tactical-900 border border-tactical-700 rounded-2xl p-4 shadow-md space-y-4">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <span id="meso-badge" class="inline-block px-2.5 py-1 rounded-md text-xs font-mono font-bold bg-lime-500/20 text-lime-300 border border-lime-500/30 mb-1">
+              MESOCICLO 1 • BASE AERÓBICA E EFICIÊNCIA TÉCNICA
+            </span>
+            <h2 id="week-title" class="text-lg sm:text-xl font-bold text-white">Semana 1 (24/11/2026 a 29/11/2026)</h2>
+            <p id="week-focus-desc" class="text-xs sm:text-sm text-slate-300 mt-0.5">Adaptação articular, economia de braçada na natação, início das tabelas de CO₂ e rodagem controlada.</p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="changeWeek(-1)" class="p-2.5 rounded-xl bg-tactical-800 hover:bg-tactical-700 border border-tactical-700 text-slate-200 transition text-xs font-semibold">
+              ◀ Anterior
+            </button>
+            <select id="week-selector" onchange="selectWeek(this.value)" class="bg-tactical-850 border border-tactical-700 text-white text-xs sm:text-sm rounded-xl px-3 py-2.5 font-mono focus:outline-none focus:border-amber-500">
+              <!-- Populado via JS -->
+            </select>
+            <button onclick="changeWeek(1)" class="p-2.5 rounded-xl bg-tactical-800 hover:bg-tactical-700 border border-tactical-700 text-slate-200 transition text-xs font-semibold">
+              Próxima ▶
+            </button>
+            <button onclick="jumpToRelevantDate()" class="px-3 py-2.5 rounded-xl bg-amber-600/20 hover:bg-amber-600/30 border border-amber-500/40 text-amber-300 text-xs font-semibold transition">
+              📍 Dia Atual / Início
+            </button>
+          </div>
+        </div>
+
+        <!-- Filtros rápidos de Mesociclo -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-tactical-800">
+          <button onclick="selectWeek(1)" class="text-left p-2.5 rounded-xl bg-tactical-850 hover:bg-tactical-800 border border-tactical-700 transition">
+            <div class="text-[11px] font-mono text-lime-400 font-bold">MESO 1 (Sem 1–8)</div>
+            <div class="text-xs text-slate-300 truncate">Base Técnica & Adaptação</div>
+          </button>
+          <button onclick="selectWeek(9)" class="text-left p-2.5 rounded-xl bg-tactical-850 hover:bg-tactical-800 border border-tactical-700 transition">
+            <div class="text-[11px] font-mono text-sky-400 font-bold">MESO 2 (Sem 9–16)</div>
+            <div class="text-xs text-slate-300 truncate">Volume & Limiar Anaeróbico</div>
+          </button>
+          <button onclick="selectWeek(17)" class="text-left p-2.5 rounded-xl bg-tactical-850 hover:bg-tactical-800 border border-tactical-700 transition">
+            <div class="text-[11px] font-mono text-amber-400 font-bold">MESO 3 (Sem 17–24)</div>
+            <div class="text-xs text-slate-300 truncate">Sobrecarga & Fardamento</div>
+          </button>
+          <button onclick="selectWeek(25)" class="text-left p-2.5 rounded-xl bg-tactical-850 hover:bg-tactical-800 border border-tactical-700 transition">
+            <div class="text-[11px] font-mono text-rose-400 font-bold">MESO 4 (Sem 25–31)</div>
+            <div class="text-xs text-slate-300 truncate">Simulados COT & Polimento</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Grade dos Dias da Semana Selecionada -->
+      <div id="days-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <!-- Cards dos dias injetados via JS -->
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- ABA 2: SIMULADOR TAF & ÍNDICES DE DENTRO DO CURSO         -->
+    <!-- ========================================================= -->
+    <section id="view-metas" class="hidden space-y-6">
+      <div class="bg-tactical-900 border border-tactical-700 rounded-2xl p-5">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+          <div>
+            <h2 class="text-xl font-bold text-white">Painel de Controle de Índices: TAF vs. Curso COT</h2>
+            <p class="text-xs sm:text-sm text-slate-400">Atualize suas marcas atuais conforme evolui nos simulados. Os dados ficam salvos automaticamente no seu navegador.</p>
+          </div>
+          <button onclick="resetMetricsToBaseline()" class="px-3 py-2 rounded-xl bg-tactical-800 hover:bg-tactical-700 border border-tactical-700 text-xs text-slate-300">
+            Restaurar Linha de Base (24/11/2026)
+          </button>
+        </div>
+
+        <!-- Tabela/Cards Comparativos -->
+        <div id="metrics-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Gerado via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- ABA 3: CRONÔMETRO TÁTICO DE APNEIA E FLUTUAÇÃO            -->
+    <!-- ========================================================= -->
+    <section id="view-cronometro" class="hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Módulo 1: Treinador de Apneia (CO2 / O2 / Máxima) -->
+        <div class="bg-tactical-900 border border-tactical-700 rounded-2xl p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="px-2.5 py-1 rounded text-xs font-mono font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">PROTOCOLO APNEIA • META 02:30</span>
+              <span id="apnea-round-badge" class="text-xs font-mono text-slate-400">Série 1 / 6</span>
+            </div>
+            <h3 class="text-lg font-bold text-white">Treinador de Tabelas de CO₂ e O₂</h3>
+            <p class="text-xs text-slate-400 mt-1">Use este timer nas quartas-feiras (piscina com dupla de segurança) ou em seco na cama/sofá (nunca treine apneia sozinho na água!).</p>
+
+            <!-- Seletor de Protocolo -->
+            <div class="mt-4">
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Selecione a Tabela de Treino:</label>
+              <select id="apnea-protocol" onchange="setupApneaProtocol()" class="w-full bg-tactical-850 border border-tactical-700 rounded-xl px-3 py-2.5 text-sm text-white">
+                <option value="co2_iniciante">Tabela CO₂ - Nível 1 (Semanas 1–6): Retenção fixa 0:45 | Descanso 1:30 → 0:30</option>
+                <option value="co2_inter">Tabela CO₂ - Nível 2 (Semanas 7–14): Retenção fixa 1:15 | Descanso 1:30 → 0:30</option>
+                <option value="co2_avancado">Tabela CO₂ - Nível 3 (Semanas 15–22): Retenção fixa 1:45 | Descanso 1:15 → 0:25</option>
+                <option value="o2_pico">Tabela O₂ - Pico (Semanas 23–31): Descanso fixo 1:30 | Retenção 1:15 → 2:30</option>
+              </select>
+            </div>
+
+            <!-- Visor Digital -->
+            <div id="apnea-display-box" class="my-6 p-6 rounded-2xl bg-tactical-950 border-2 border-tactical-700 text-center transition-colors">
+              <div id="apnea-phase-label" class="text-sm font-mono font-bold uppercase tracking-widest text-amber-400">PRONTO PARA INICIAR</div>
+              <div id="apnea-timer-text" class="text-5xl sm:text-6xl font-mono font-extrabold text-white my-2">00:45</div>
+              <div id="apnea-instruction" class="text-xs text-slate-400">Respire calmamente pelo diafragma antes de iniciar.</div>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <button onclick="startApneaTimer()" class="flex-1 py-3 px-4 rounded-xl bg-lime-600 hover:bg-lime-500 text-slate-950 font-bold text-sm transition">
+              ▶ Iniciar / Continuar
+            </button>
+            <button onclick="pauseApneaTimer()" class="py-3 px-4 rounded-xl bg-tactical-800 hover:bg-tactical-700 border border-tactical-700 text-white font-semibold text-sm transition">
+              ⏸ Pausar
+            </button>
+            <button onclick="setupApneaProtocol()" class="py-3 px-4 rounded-xl bg-rose-950/60 hover:bg-rose-900/60 border border-rose-700/50 text-rose-300 font-semibold text-sm transition">
+              ↺ Resetar
+            </button>
+          </div>
+        </div>
+
+        <!-- Módulo 2: Cronômetro de Flutuação Vertical & Simulado TAF -->
+        <div class="bg-tactical-900 border border-tactical-700 rounded-2xl p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="px-2.5 py-1 rounded text-xs font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">MEIO LÍQUIDO & TESTES</span>
+              <span class="text-xs font-mono text-slate-400">Sem aviso sonoro no TAF</span>
+            </div>
+            <h3 class="text-lg font-bold text-white">Cronômetro Regressivo Operacional</h3>
+            <p class="text-xs text-slate-400 mt-1">Configure rapidamente os tempos oficiais do Anexo IX e Anexo X da Portaria 758/2024.</p>
+
+            <!-- Presets rápidos -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-4">
+              <button onclick="setQuickTimer(60, 'Sustentação na Barra (1 min)')" class="p-2 rounded-xl bg-tactical-850 hover:bg-tactical-800 border border-tactical-700 text-xs font-mono text-slate-200">01:00 Barra</button>
+              <button onclick="setQuickTimer(80, 'Abdominal Remador (80 seg)')" class="p-2 rounded-xl bg-tactical-850 hover:bg-tactical-800 border border-tactical-700 text-xs font-mono text-slate-200">01:20 Abdômen</button>
+              <button onclick="setQuickTimer(300, 'Natação 200m / Pista (5 min)')" class="p-2 rounded-xl bg-tactical-850 hover:bg-tactical-800 border border-tactical-700 text-xs font-mono text-slate-200">05:00 Nado/Pista</button>
+              <button onclick="setQuickTimer(900, 'Corrida 3.000m TAF (15 min)')" class="p-2 rounded-xl bg-tactical-850 hover:bg-tactical-800 border border-tactical-700 text-xs font-mono text-slate-200">15:00 Corrida 3k</button>
+              <button onclick="setQuickTimer(1200, 'Flutuação Vertical TAF (20 min)')" class="p-2 rounded-xl bg-tactical-850 hover:bg-tactical-800 border border-tactical-700 text-xs font-mono text-amber-300">20:00 Flutuação TAF</button>
+              <button onclick="setQuickTimer(3600, 'Flutuação Curso Fardado (60 min)')" class="p-2 rounded-xl bg-tactical-850 hover:bg-tactical-800 border border-tactical-700 text-xs font-mono text-lime-300">60:00 Flutuação Curso</button>
+            </div>
+
+            <div class="my-6 p-6 rounded-2xl bg-tactical-950 border-2 border-tactical-700 text-center">
+              <div id="quick-timer-label" class="text-sm font-mono font-bold uppercase tracking-wider text-sky-400">Flutuação Vertical TAF (20 min)</div>
+              <div id="quick-timer-text" class="text-5xl sm:text-6xl font-mono font-extrabold text-white my-2">20:00</div>
+              <div class="text-xs text-slate-400">Lembrete Edital: No TAF não é permitido "boiar" nem usar o uniforme para reter ar.</div>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <button onclick="startQuickTimer()" class="flex-1 py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm transition">
+              ▶ Iniciar Cronômetro
+            </button>
+            <button onclick="pauseQuickTimer()" class="py-3 px-4 rounded-xl bg-tactical-800 hover:bg-tactical-700 border border-tactical-700 text-white font-semibold text-sm transition">
+              ⏸ Pausar
+            </button>
+            <button onclick="resetQuickTimer()" class="py-3 px-4 rounded-xl bg-tactical-800 hover:bg-tactical-700 border border-tactical-700 text-slate-300 font-semibold text-sm transition">
+              ↺ Zerar
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- ABA 4: PERIODIZAÇÃO E GRÁFICOS DE EVOLUÇÃO                -->
+    <!-- ========================================================= -->
+    <section id="view-evolucao" class="hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-tactical-900 border border-tactical-700 rounded-2xl p-5">
+          <h3 class="text-base font-bold text-white mb-1">Curva de Progressão: Corrida & Marcha Operacional</h3>
+          <p class="text-xs text-slate-400 mb-4">Evolução semanal da distância de marcha (km) e sobrecarga (kg) rumo aos >15km com 25kg.</p>
+          <div class="h-64">
+            <canvas id="chartMarcha"></canvas>
+          </div>
+        </div>
+
+        <div class="bg-tactical-900 border border-tactical-700 rounded-2xl p-5">
+          <h3 class="text-base font-bold text-white mb-1">Curva de Progressão: Natação (40 min) & Apneia</h3>
+          <p class="text-xs text-slate-400 mb-4">Evolução do volume contínuo nos 40 min matinais e tempo de apneia estática (segundos).</p>
+          <div class="h-64">
+            <canvas id="chartAquatico"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resumo Estrutural dos 4 Mesociclos -->
+      <div class="bg-tactical-900 border border-tactical-700 rounded-2xl p-5">
+        <h3 class="text-lg font-bold text-white mb-4">Arquitetura dos 4 Mesociclos (31 Semanas)</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="p-4 rounded-xl bg-tactical-850 border border-lime-500/30">
+            <div class="text-xs font-mono font-bold text-lime-400">MESOCICLO 1 • SEM 1 A 8</div>
+            <div class="text-sm font-bold text-white mt-1">24/11/2026 – 18/01/2027</div>
+            <ul class="text-xs text-slate-300 mt-3 space-y-1.5 list-disc list-inside">
+              <li><strong>Natação:</strong> Corrigir fadiga dos 50m; respiração bilateral; atingir 1.000m fracionados/contínuos.</li>
+              <li><strong>Apneia:</strong> Tabelas CO₂ base (45s → 1:15).</li>
+              <li><strong>Corrida:</strong> 4km → 7km @ 5:15/km + tiros leves.</li>
+              <li><strong>Marcha:</strong> 6 a 8 km com 10–12 kg (coturno amaciando).</li>
+            </ul>
+          </div>
+
+          <div class="p-4 rounded-xl bg-tactical-850 border border-sky-500/30">
+            <div class="text-xs font-mono font-bold text-sky-400">MESOCICLO 2 • SEM 9 A 16</div>
+            <div class="text-sm font-bold text-white mt-1">19/01/2027 – 15/03/2027</div>
+            <ul class="text-xs text-slate-300 mt-3 space-y-1.5 list-disc list-inside">
+              <li><strong>Natação:</strong> 1.500m–1.800m em 40min + início flutuação (15–25 min).</li>
+              <li><strong>Apneia:</strong> Tabelas CO₂/O₂ (1:15 → 1:45) + submerso 12m.</li>
+              <li><strong>Corrida:</strong> 10km @ 5:05/km + tiros pace 4:00/km.</li>
+              <li><strong>Marcha:</strong> 10 a 12 km com 15–18 kg.</li>
+            </ul>
+          </div>
+
+          <div class="p-4 rounded-xl bg-tactical-850 border border-amber-500/30">
+            <div class="text-xs font-mono font-bold text-amber-400">MESOCICLO 3 • SEM 17 A 24</div>
+            <div class="text-sm font-bold text-white mt-1">16/03/2027 – 10/05/2027</div>
+            <ul class="text-xs text-slate-300 mt-3 space-y-1.5 list-disc list-inside">
+              <li><strong>Natação:</strong> Fardado 800m–1.500m; flutuação 35–45 min; desequipar/equipar.</li>
+              <li><strong>Apneia:</strong> Retenção 2:00–2:15 + submerso fardado 15m.</li>
+              <li><strong>Corrida:</strong> 10km @ 4:55/km confortável + longão 15km.</li>
+              <li><strong>Marcha:</strong> 14 a 16 km com 20–23 kg.</li>
+            </ul>
+          </div>
+
+          <div class="p-4 rounded-xl bg-tactical-850 border border-rose-500/30">
+            <div class="text-xs font-mono font-bold text-rose-400">MESOCICLO 4 • SEM 25 A 31</div>
+            <div class="text-sm font-bold text-white mt-1">11/05/2027 – 01/07/2027</div>
+            <ul class="text-xs text-slate-300 mt-3 space-y-1.5 list-disc list-inside">
+              <li><strong>Natação:</strong> Flutuação 60min fardado + 10min com simulacro; 3.000m contínuo.</li>
+              <li><strong>Apneia:</strong> Consolidação 2:30+ e submerso >15m.</li>
+              <li><strong>Corrida:</strong> 10km @ 4:50/km + corrida fardada + TAF completo.</li>
+              <li><strong>Marcha:</strong> 16–18 km com 25 kg + Semana 31 de Polimento.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- ABA 5: PROTOCOLO FISIOLÓGICO & PREVENÇÃO DE LESÕES        -->
+    <!-- ========================================================= -->
+    <section id="view-diretrizes" class="hidden space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-tactical-900 border border-tactical-700 rounded-2xl p-5 space-y-3">
+          <h3 class="text-lg font-bold text-amber-400">1. Ajuste da Musculação Noturna (6x/semana)</h3>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Como você treina musculação todas as noites (Seg a Sáb) somada aos treinos operacionais matinais, o maior risco é a <strong>rabdomiólise</strong> (exame exigido no Anexo VII - CPK!) e tendinites de ombro/joelho.
+          </p>
+          <ul class="text-xs text-slate-300 space-y-2 border-t border-tactical-800 pt-3">
+            <li><strong class="text-white">Seg/Qui (Peito, Tríceps, Ombro):</strong> Inclua 3 a 4 séries de <em>Flexão no solo padrão TAF</em> (peito tocando a mão, cotovelos fechados) e <em>Abdominal Remador</em> no início ou fim do treino. Evite falha total no desenvolvimento de ombros para não prejudicar a braçada da natação na manhã seguinte.</li>
+            <li><strong class="text-white">Ter/Sex (Costas, Bíceps, Trapézio):</strong> Abra o treino com <em>Barra Fixa Pronada</em> (sem galeio) + <em>Sustentação Isométrica na Barra</em> (60s+). Trabalhe pegada (farmer's walk / toalha na barra) pensando na corda de 6 metros da pista de obstáculos.</li>
+            <li><strong class="text-white">Qua (Pernas + Abdômen):</strong> Mantenha 2 a 3 repetições na reserva (RIR 2-3). Não faça drop-sets ou falha extrema na quarta à noite para que suas pernas estejam responsivas na corrida de quinta pela manhã.</li>
+            <li><strong class="text-white">Sáb (Pernas + Abdômen Pós-Marcha):</strong> Após a marcha matinal de sábado, o treino noturno de pernas deve focar em <strong>cadeia posterior, mobilidade de quadril, panturrilha/tibial anterior (prevenção de canelite) e core anti-rotacional</strong>, com cargas moderadas.</li>
+          </ul>
+        </div>
+
+        <div class="bg-tactical-900 border border-tactical-700 rounded-2xl p-5 space-y-3">
+          <h3 class="text-lg font-bold text-sky-400">2. Correção Técnica da Natação & Apneia Segura</h3>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Você relatou nadar rápido por 50m e cansar logo. No COT, velocidade explosiva de 50m importa pouco perto da <strong>resistência aeróbica aquática e economia energética</strong>.
+          </p>
+          <ul class="text-xs text-slate-300 space-y-2 border-t border-tactical-800 pt-3">
+            <li><strong class="text-white">Regra dos 80% de Esforço:</strong> Nas primeiras 8 semanas, nade como se estivesse em câmera lenta, deslizando após cada braçada (<em>catch-up drill</em>) e soltando todo o ar pelo nariz enquanto o rosto está na água.</li>
+            <li><strong class="text-white">Pernada Econômica:</strong> Reduza a batida de pernas para 2 batidas por ciclo de braço (estilo fundista). Pernas consomem muito oxigênio e geram lactato rápido.</li>
+            <li><strong class="text-white">Segurança Absoluta na Apneia:</strong> <u>JAMAIS</u> faça hiperventilação forçada antes de mergulhar e <u>NUNCA</u> treine apneia na piscina sem um guarda-vidas ou parceiro atento observando você o tempo todo (risco de apagamento em águas rasas / <em>shallow water blackout</em>).</li>
+            <li><strong class="text-white">Flutuação Vertical (Palmáteio + Pernada Alternada):</strong> Aprenda a técnica de <em>eggbeater</em> (pernada de polo aquático) alternada com pernada de peito suave e palmáteio horizontal com as mãos. Isso permitirá flutuar 60 minutos fardado sem exaustão.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL DE ANOTAÇÕES / DETALHES DO DIA -->
+  <div id="note-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-tactical-900 border border-tactical-700 rounded-2xl max-w-lg w-full p-5 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-tactical-800 pb-3">
+        <div>
+          <span id="modal-date-badge" class="text-xs font-mono text-amber-400 font-bold">24/11/2026</span>
+          <h3 id="modal-title" class="text-base font-bold text-white">Diário de Bordo do Treino</h3>
+        </div>
+        <button onclick="closeNoteModal()" class="text-slate-400 hover:text-white text-xl font-bold px-2">&times;</button>
+      </div>
+      <div class="mt-4 space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Percepção Subjetiva de Esforço (RPE 1 a 10):</label>
+          <select id="modal-rpe" class="w-full bg-tactical-850 border border-tactical-700 rounded-xl px-3 py-2 text-sm text-white">
+            <option value="">Não informado</option>
+            <option value="1-3 (Muito Leve / Regenerativo)">1-3 • Muito Leve / Regenerativo</option>
+            <option value="4-5 (Moderado / Confortável)">4-5 • Moderado / Confortável</option>
+            <option value="6-7 (Intenso / Limiar)">6-7 • Intenso / Limiar</option>
+            <option value="8-9 (Muito Intenso / Operacional)">8-9 • Muito Intenso / Operacional</option>
+            <option value="10 (Esforço Máximo / Simulado)">10 • Esforço Máximo / Simulado</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Métricas Obtidas & Observações (Pace, Tempo Apneia, Carga Marcha, Dores):</label>
+          <textarea id="modal-note-text" rows="4" placeholder="Ex: Corrida 6km em 30:40 (pace 5:06/km), sensação muito boa. Barra: 11 reps." class="w-full bg-tactical-850 border border-tactical-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500"></textarea>
+        </div>
+      </div>
+      <div class="mt-5 flex justify-end gap-2">
+        <button onclick="closeNoteModal()" class="px-4 py-2 rounded-xl bg-tactical-800 text-slate-300 text-xs font-semibold">Cancelar</button>
+        <button onclick="saveDayNote()" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold">Salvar Registro</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. GERAÇÃO PROGRAMÁTICA DOS 220 DIAS EXATOS (24/11/2026 A 01/07/2027)
+    // =========================================================================
+    const START_DATE = new Date(2026, 10, 24); // 24 de Novembro de 2026 (Terça-feira)
+    const END_DATE = new Date(2027, 6, 1);    // 01 de Julho de 2027 (Quinta-feira)
+
+    const DIAS_SEMANA = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+
+    // Estado persistente no localStorage
+    let userState = JSON.parse(localStorage.getItem('cot_2027_state')) || {
+      completed: {}, // { '2026-11-24': true }
+      notes: {},     // { '2026-11-24': { rpe: '...', text: '...' } }
+      metrics: null
+    };
+
+    function saveState() {
+      localStorage.setItem('cot_2027_state', JSON.stringify(userState));
+      updateHeaderKPIs();
+    }
+
+    // Função que retorna o plano detalhado por Semana (1..31) e Dia da Semana (0..6)
+    function getWorkoutForDay(weekNum, dayOfWeek, isoDate) {
+      // Definição do Mesociclo
+      let meso = 1;
+      if (weekNum >= 9 && weekNum <= 16) meso = 2;
+      else if (weekNum >= 17 && weekNum <= 24) meso = 3;
+      else if (weekNum >= 25) meso = 4;
+
+      // Semana de descarga (deload) a cada 4 semanas para evitar lesões e overtraining
+      const isDeload = (weekNum === 4 || weekNum === 8 || weekNum === 12 || weekNum === 16 || weekNum === 20 || weekNum === 24 || weekNum === 28);
+      const isTaper = (weekNum === 31); // Polimento final para 01/07/2027
+
+      // Parâmetros progressivos calculados por semana
+      // 1) Corrida Quinta-feira (Longão/Contínuo rumo aos 10km @ 5:00/km)
+      const distQuinta = isTaper ? 6 : isDeload ? Math.max(5, Math.round(4 + weekNum * 0.3)) : Math.min(16, Math.round(4.5 + weekNum * 0.42));
+      const paceAlvoQuinta = weekNum <= 6 ? "5:15–5:20/km" : weekNum <= 14 ? "5:05–5:10/km" : weekNum <= 22 ? "4:55–5:00/km (10km confortáveis)" : "4:50–5:00/km (Fácil/Estável)";
+
+      // 2) Marcha Sábado (Volume km e Carga kg rumo a >15km com 25kg)
+      const marchaKm = isTaper ? 6 : isDeload ? Math.max(6, Math.round(5 + weekNum * 0.35)) : Math.min(18, Math.round(6 + weekNum * 0.43));
+      const marchaKg = isTaper ? 10 : Math.min(25, Math.round(10 + (weekNum / 27) * 15));
+
+      // 3) Natação Segunda (Volume nos 40 min)
+      const nadoContM = isTaper ? 1000 : Math.min(2200, Math.round(400 + weekNum * 62));
+
+      // 4) Apneia Quarta
+      const apneiaAlvo = weekNum <= 6 ? "0:45 a 1:00" : weekNum <= 14 ? "1:15 a 1:45" : weekNum <= 22 ? "1:50 a 2:15" : "2:20 a 2:40+";
+
+      // 5) Flutuação Sexta
+      const flutMin = weekNum <= 6 ? 10 : weekNum <= 12 ? 20 : weekNum <= 18 ? 30 : weekNum <= 24 ? 45 : 60;
+
+      // Retorno específico por dia da semana
+      switch (dayOfWeek) {
+        case 1: // SEGUNDA-FEIRA: Manhã Aquático (40m) + Noite Peito/Tríceps/Ombro
+          return {
+            tag: isDeload ? "REGENERATIVO / TÉCNICA" : "AQUÁTICO + MUSCULAÇÃO A",
+            tagColor: "sky",
+            manha: {
+              titulo: `Natação Técnica & Resistência (40 min)`,
+              detalhes: weekNum <= 6
+                ? `Aquecimento 100m livre leve. Educativos de deslize e expiração submersa (4x50m com 30s pausa). Série principal: ${Math.round(nadoContM/50)}x50m em ritmo controlado (75% esforço, focando em não cansar no fim, 20s pausa). Soltura 100m.`
+                : weekNum <= 16
+                ? `Aquecimento 200m. Série principal: ${nadoContM}m contínuos (ou 2x${nadoContM/2}m) mantendo braçada longa e respiração bilateral. Finalizar com 4x50m forte (ritmo TAF 200m < 4:30).`
+                : `Aquecimento 200m. Nado contínuo forte ${nadoContM}m dentro dos 40 min. Nas semanas pares, realizar os últimos 400m vestindo gandola para adaptação de arrasto.`
+            },
+            noite: {
+              titulo: `Musculação A: Peito, Tríceps e Ombro + TAF Solo`,
+              detalhes: `1) Específico TAF: ${weekNum <= 10 ? '3x25' : weekNum <= 20 ? '3x35' : '3x42'} Flexões no solo (peito na mão, cotovelos fechados) + ${weekNum <= 10 ? '3x35' : '3x55'} Abdominais Remadores (em <75s). 2) Hipertrofia/Força: Supino reto (4x8-10), Supino inclinado halteres (3x10), Desenvolvimento militar (3x10), Elevação lateral (3x12), Tríceps paralelas/pulley (3x12).`
+            }
+          };
+
+        case 2: // TERÇA-FEIRA: Manhã Corrida (Velocidade/Tiros) + Noite Costas/Bíceps/Trapézio
+          return {
+            tag: isDeload ? "TIROS LEVES + BARRA" : "CORRIDA VELOCIDADE + MUSC. B",
+            tagColor: "amber",
+            manha: {
+              titulo: `Corrida: Potência Aeróbica & Limiar (Pace Alvo 4:00/km)`,
+              detalhes: isTaper
+                ? `Rodagem leve 4km @ 5:15/km + 4 acelerações de 100m para manter tônus neuromuscular.`
+                : weekNum <= 8
+                ? `Aquecimento 1.5km leve + mobilidade. Principal: ${isDeload ? '4' : '6'}x400m @ pace 4:05–4:15/km (intervalo 90s trote leve). Desaquecimento 1km.`
+                : weekNum <= 18
+                ? `Aquecimento 1.5km. Principal: ${isDeload ? '4' : '6'}x800m @ pace 4:00–4:10/km (intervalo 2min trote). Desaquecimento 1km.`
+                : `Aquecimento 2km. Principal: ${isDeload ? '3' : '5'}x1.000m @ pace 3:55–4:05/km (exigência do edital: <4'/km) com 2min pausa. Desaquecimento 1km.`
+            },
+            noite: {
+              titulo: `Musculação B: Costas, Bíceps e Trapézio + Barra TAF`,
+              detalhes: `1) Específico TAF: ${weekNum <= 8 ? '4x8' : weekNum <= 18 ? '4x11' : '4x14'} Barra Fixa Pronada (sem galeio, queixo acima) + 2 séries de Sustentação Isométrica na Barra (${weekNum <= 10 ? '45s–60s' : '65s–80s'}). 2) Musculação: Puxada frontal (3x10), Remada curvada (4x8-10), Encolhimento trapézio (3x12), Rosca direta (3x10) e Rosca martelo/pegada (3x12).`
+            }
+          };
+
+        case 3: // QUARTA-FEIRA: Manhã Aquático (Apneia e Submerso) + Noite Perna e Abdômen
+          return {
+            tag: "APNEIA CO₂/O₂ + PERNAS/CORE",
+            tagColor: "cyan",
+            manha: {
+              titulo: `Treino Aquático: Apneia & Nado Submerso (40 min)`,
+              detalhes: `⚠️ ATENÇÃO: Realizar apenas com dupla de segurança! Aquecimento 200m nado calmo. Bloco Apneia Estática: 6 a 8 séries seguindo tabela CO₂/O₂ (Meta atual: ${apneiaAlvo}). Bloco Submerso: ${weekNum <= 10 ? '4x12m' : '5x15m a 20m'} de nado submerso (a partir da Sem. 17 usar calça/gandola, exigência do curso >=15m).`
+            },
+            noite: {
+              titulo: `Musculação C: Perna Completa e Abdômen (Calibrado)`,
+              detalhes: `Treino estruturado com 2 reps na reserva para não travar a corrida de quinta: Agachamento livre (4x8), Leg Press 45° (3x10), Stiff/Mesa flexora (3x10), Panturrilha em pé (4x15), Tibial anterior (3x15 - prevenção canelite). Core: Prancha isométrica (3x60s) + Abdominal infra na barra (3x12).`
+            }
+          };
+
+        case 4: // QUINTA-FEIRA: Manhã Corrida Contínua/Longão + Noite Peito/Tríceps/Ombro
+          return {
+            tag: isDeload ? "RODAGEM REGENERATIVA" : "CORRIDA CONTÍNUA + MUSC. A",
+            tagColor: "lime",
+            manha: {
+              titulo: `Corrida Contínua / Progressiva: ${distQuinta} km`,
+              detalhes: weekNum === 1 && isoDate === '2026-11-26'
+                ? `Primeiro treino contínuo: 5 km em ritmo confortável (5:15–5:20/km), controlando respiração e cadência de passadas.`
+                : `Rodagem contínua de ${distQuinta} km buscando manter pace médio de ${paceAlvoQuinta}. ${weekNum >= 14 && weekNum % 2 === 0 ? 'Nos últimos 2 km, acelerar para pace 4:45/km (treino progressivo).' : 'Foco em conforto cardiovascular (Zona 2/3) para consolidar 10km @ 5:00/km sem desgaste.'}`
+            },
+            noite: {
+              titulo: `Musculação A: Peito, Tríceps e Ombro + Agilidade`,
+              detalhes: `1) Específico TAF: 3 tentativas de Shuttle Run (9,14m ida e volta pegando blocos, meta < 11.20s) + 2x35 Flexões explosivas. 2) Musculação: Supino reto halteres (4x10), Crucifixo máquina/cabo (3x12), Elevação frontal/lateral (3x12), Tríceps testa (3x10), Tríceps corda (3x12).`
+            }
+          };
+
+        case 5: // SEXTA-FEIRA: Manhã Aquático (Fardado & Flutuação) + Noite Costas/Bíceps/Trapézio
+          return {
+            tag: "OPERAÇÕES AQUÁTICAS + MUSC. B",
+            tagColor: "sky",
+            manha: {
+              titulo: `Meio Líquido Operacional: Flutuação (${flutMin} min) & Fardado (40 min)`,
+              detalhes: weekNum <= 8
+                ? `Flutuação vertical em traje de banho: ${flutMin} minutos sem tocar borda/fundo (técnica eggbeater + palmáteio). Tempo restante: 400m nado livre contínuo + exercícios de apneia dinâmica.`
+                : weekNum <= 18
+                ? `Traje: Calça + Gandola. Flutuação vertical fardado por ${flutMin} minutos (TAF exige 20 min). Tempo restante: ${Math.min(600, weekNum*30)}m de nado fardado (crawl/peito/lateral modificado).`
+                : `Simulado Curso COT (Calça + Gandola + Coturno ou simulacro): Flutuação vertical ${flutMin} min (últimos 5–10 min segurando peso simulando fuzil) + Nado lateral modificado (4x25m) + Exercício de desequipar e equipar no fundo da piscina.`
+            },
+            noite: {
+              titulo: `Musculação B: Costas, Bíceps e Trapézio + Pegada/Corda`,
+              detalhes: `1) Específico Pista/TAF: Subida na corda de 6m (se disponível na academia, 3 subidas) ou Barra com toalha (4x máx) + Sustentação na barra (1x70s). 2) Musculação: Barra fixa supinada (3x10), Remada baixa triângulo (4x10), Pulldown (3x12), Trapézio barra (3x12), Rosca alternada (3x10).`
+            }
+          };
+
+        case 6: // SÁBADO: Manhã Marcha Operacional + Noite Perna e Abdômen
+          return {
+            tag: isDeload ? "MARCHA LEVE + PERNAS" : "MARCHA OPERACIONAL + MUSC. C",
+            tagColor: "amber",
+            manha: {
+              titulo: `Marcha Operacional: ${marchaKm} km com ${marchaKg} kg`,
+              detalhes: `Traje: Calça tática/camuflada, camiseta, meião duplo (prevenção de bolhas) e coturno amaciado. Mochila com carga estática bem ajustada ao tronco (${marchaKg} kg). Ritmo firme de marcha (5.5 a 6.5 km/h). Hidratação a cada 20 min. Meta do Curso: >15 km com 25 kg.`
+            },
+            noite: {
+              titulo: `Musculação C: Perna Completa (Estabilidade) e Abdômen`,
+              detalhes: `Foco em proteção articular pós-marcha: Cadeira extensora (3x12 controlado), Mesa flexora (3x12), Afundo/Passada sem carga excessiva (3x10 cada perna), Elevação pélvica (3x12), Panturrilha sentado (4x15). Abdômen: 3x50 Abdominal Remador + Prancha lateral (2x45s cada lado).`
+            }
+          };
+
+        default: // DOMINGO (0): Descanso Ativo e Recuperação
+          return {
+            tag: "RECUPERAÇÃO & MOBILIDADE",
+            tagColor: "slate",
+            manha: {
+              titulo: `Descanso Ativo, Mobilidade Articular & Liberação Miofascial`,
+              detalhes: `Dia vital para supercompensação fisiológica e prevenção de lesões. Realizar 20–30 min de mobilidade de ombros, coluna torácica, quadril e tornozelos + alongamento leve. Cuidar da higiene dos pés e manutenção do coturno.`
+            },
+            noite: {
+              titulo: `Preparação da Semana & Higiene do Sono`,
+              detalhes: `Revisar equipamentos da mochila para a semana (sunga, óculos, fardamento de instrução, hidratação). Garantir 8h de sono reparador para recuperação do Sistema Nervoso Central.`
+            }
+          };
+      }
+    }
+
+    // Construir array completo dos 220 dias
+    const ALL_DAYS = [];
+    let current = new Date(START_DATE);
+    let dayIndex = 1;
+
+    while (current <= END_DATE) {
+      const iso = current.toISOString().split('T')[0];
+      const dd = String(current.getDate()).padStart(2, '0');
+      const mm = String(current.getMonth() + 1).padStart(2, '0');
+      const yyyy = current.getFullYear();
+      const dateStr = `${dd}/${mm}/${yyyy}`;
+      const dow = current.getDay(); // 0=Dom, 1=Seg, 2=Ter...
+      const weekNum = Math.floor((dayIndex - 1) / 7) + 1;
+
+      const plan = getWorkoutForDay(weekNum, dow, iso);
+
+      ALL_DAYS.push({
+        dayNumber: dayIndex,
+        weekNum: weekNum,
+        iso: iso,
+        dateStr: dateStr,
+        dow: dow,
+        dowName: DIAS_SEMANA[dow],
+        plan: plan
+      });
+
+      current.setDate(current.getDate() + 1);
+      dayIndex++;
+    }
+
+    const TOTAL_DAYS = ALL_DAYS.length; // 220 dias exatos
+    const TOTAL_WEEKS = Math.max(...ALL_DAYS.map(d => d.weekNum)); // 32 blocos semanais parciais/completos (31.4 semanas)
+
+    // =========================================================================
+    // 2. RENDERIZAÇÃO DO CALENDÁRIO SEMANAL
+    // =========================================================================
+    let selectedWeek = 1;
+    let activeModalIso = null;
+
+    function initWeekSelector() {
+      const sel = document.getElementById('week-selector');
+      sel.innerHTML = '';
+      for (let w = 1; w <= TOTAL_WEEKS; w++) {
+        const daysInW = ALL_DAYS.filter(d => d.weekNum === w);
+        const firstD = daysInW[0].dateStr.slice(0, 5);
+        const lastD = daysInW[daysInW.length - 1].dateStr.slice(0, 5);
+        const opt = document.createElement('option');
+        opt.value = w;
+        opt.textContent = `Semana ${String(w).padStart(2, '0')} (${firstD} a ${lastD})`;
+        sel.appendChild(opt);
+      }
+    }
+
+    function selectWeek(w) {
+      selectedWeek = Math.max(1, Math.min(TOTAL_WEEKS, parseInt(w)));
+      document.getElementById('week-selector').value = selectedWeek;
+      renderWeekView();
+    }
+
+    function changeWeek(delta) {
+      selectWeek(selectedWeek + delta);
+    }
+
+    function jumpToRelevantDate() {
+      const todayIso = new Date().toISOString().split('T')[0];
+      const found = ALL_DAYS.find(d => d.iso === todayIso);
+      if (found) {
+        selectWeek(found.weekNum);
+      } else {
+        selectWeek(1); // 24/11/2026
+      }
+    }
+
+    function toggleDayComplete(iso) {
+      if (userState.completed[iso]) {
+        delete userState.completed[iso];
+      } else {
+        userState.completed[iso] = true;
+      }
+      saveState();
+      renderWeekView();
+    }
+
+    function renderWeekView() {
+      const days = ALL_DAYS.filter(d => d.weekNum === selectedWeek);
+      const firstDate = days[0].dateStr;
+      const lastDate = days[days.length - 1].dateStr;
+
+      // Atualizar cabeçalho do mesociclo
+      const badge = document.getElementById('meso-badge');
+      const focusDesc = document.getElementById('week-focus-desc');
+      if (selectedWeek <= 8) {
+        badge.className = "inline-block px-2.5 py-1 rounded-md text-xs font-mono font-bold bg-lime-500/20 text-lime-300 border border-lime-500/30 mb-1";
+        badge.textContent = "MESOCICLO 1 • BASE AERÓBICA E EFICIÊNCIA TÉCNICA";
+        focusDesc.textContent = "Foco em eliminar a fadiga precoce nos 50m de natação, adaptar tendões à marcha e iniciar tabelas de CO₂.";
+      } else if (selectedWeek <= 16) {
+        badge.className = "inline-block px-2.5 py-1 rounded-md text-xs font-mono font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30 mb-1";
+        badge.textContent = "MESOCICLO 2 • CONSTRUÇÃO DE VOLUME E LIMIAR";
+        focusDesc.textContent = "Expansão do volume contínuo na natação e corrida (atingindo 10km @ 5:05/km) + introdução de flutuação vertical.";
+      } else if (selectedWeek <= 24) {
+        badge.className = "inline-block px-2.5 py-1 rounded-md text-xs font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 mb-1";
+        badge.textContent = "MESOCICLO 3 • SOBRECARGA OPERACIONAL E FARDAMENTO";
+        focusDesc.textContent = "Treinos com gandola/calça na água, flutuação estendida, apneia >2min e marchas pesadas acima de 20kg.";
+      } else {
+        badge.className = "inline-block px-2.5 py-1 rounded-md text-xs font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 mb-1";
+        badge.textContent = "MESOCICLO 4 • PICO DE PERFORMANCE, SIMULADOS E POLIMENTO";
+        focusDesc.textContent = "Consolidação de todas as metas do edital COT (TAF + Curso) e polimento final para 01/07/2027.";
+      }
+
+      document.getElementById('week-title').textContent = `Semana ${selectedWeek} de ${TOTAL_WEEKS} (${firstDate} a ${lastDate})`;
+
+      const grid = document.getElementById('days-grid');
+      grid.innerHTML = '';
+
+      const colorMap = {
+        sky: 'border-sky-500/40 text-sky-300 bg-sky-500/10',
+        amber: 'border-amber-500/40 text-amber-300 bg-amber-500/10',
+        cyan: 'border-cyan-500/40 text-cyan-300 bg-cyan-500/10',
+        lime: 'border-lime-500/40 text-lime-300 bg-lime-500/10',
+        slate: 'border-slate-600/40 text-slate-300 bg-slate-700/20'
+      };
+
+      days.forEach(d => {
+        const isDone = !!userState.completed[d.iso];
+        const noteObj = userState.notes[d.iso];
+        const isStartDay = d.iso === '2026-11-24';
+        const isEndDay = d.iso === '2027-07-01';
+
+        const card = document.createElement('div');
+        card.className = `rounded-2xl border transition-all flex flex-col justify-between p-4 ${
+          isDone
+            ? 'bg-tactical-900/60 border-lime-500/50 shadow-inner'
+            : 'bg-tactical-900 border-tactical-700 hover:border-tactical-600 shadow-lg'
+        }`;
+
+        card.innerHTML = `
+          <div>
+            <!-- Topo do Card -->
+            <div class="flex items-start justify-between gap-2 pb-3 border-b border-tactical-800">
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-xs font-mono font-bold text-slate-400">DIA ${String(d.dayNumber).padStart(3, '0')}</span>
+                  <span class="text-sm font-extrabold text-white">${d.dateStr}</span>
+                  ${isStartDay ? '<span class="px-1.5 py-0.5 text-[10px] font-mono font-bold rounded bg-amber-500 text-slate-950">INÍCIO</span>' : ''}
+                  ${isEndDay ? '<span class="px-1.5 py-0.5 text-[10px] font-mono font-bold rounded bg-lime-400 text-slate-950">DIA ALVO</span>' : ''}
+                </div>
+                <div class="text-xs font-semibold text-amber-400 mt-0.5">${d.dowName}</div>
+              </div>
+
+              <button onclick="toggleDayComplete('${d.iso}')" class="px-2.5 py-1.5 rounded-xl text-xs font-bold border transition flex items-center gap-1.5 ${
+                isDone
+                  ? 'bg-lime-500 text-slate-950 border-lime-400'
+                  : 'bg-tactical-850 text-slate-300 border-tactical-700 hover:border-lime-500/50'
+              }">
+                <span>${isDone ? '✓ Concluído' : '○ Marcar'}</span>
+              </button>
+            </div>
+
+            <!-- Badge da Sessão -->
+            <div class="mt-3">
+              <span class="inline-block px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${colorMap[d.plan.tagColor] || colorMap.slate}">
+                ${d.plan.tag}
+              </span>
+            </div>
+
+            <!-- Treino Manhã -->
+            <div class="mt-3 p-3 rounded-xl bg-tactical-850 border border-tactical-800">
+              <div class="flex items-center gap-1.5 text-xs font-bold text-sky-300">
+                <span>🌅 MANHÃ:</span>
+                <span>${d.plan.manha.titulo}</span>
+              </div>
+              <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">${d.plan.manha.detalhes}</p>
+            </div>
+
+            <!-- Treino Noite -->
+            <div class="mt-2.5 p-3 rounded-xl bg-tactical-850 border border-tactical-800">
+              <div class="flex items-center gap-1.5 text-xs font-bold text-amber-300">
+                <span>🌙 NOITE:</span>
+                <span>${d.plan.noite.titulo}</span>
+              </div>
+              <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">${d.plan.noite.detalhes}</p>
+            </div>
+          </div>
+
+          <!-- Rodapé do Card: Anotações / RPE -->
+          <div class="mt-3 pt-2.5 border-t border-tactical-800 flex items-center justify-between gap-2">
+            <div class="text-[11px] text-slate-400 truncate max-w-[70%]">
+              ${noteObj && (noteObj.text || noteObj.rpe)
+                ? `<span class="text-lime-400 font-semibold">📝 ${noteObj.rpe ? '['+noteObj.rpe.split(' ')[0]+'] ' : ''}${noteObj.text || 'Registrado'}</span>`
+                : 'Sem anotações de treino'}
+            </div>
+            <button onclick="openNoteModal('${d.iso}', '${d.dateStr} • ${d.dowName}')" class="text-xs font-semibold text-amber-400 hover:text-amber-300 whitespace-nowrap">
+              + Diário
+            </button>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+    }
+
+    function updateHeaderKPIs() {
+      const doneCount = Object.keys(userState.completed).length;
+      const pct = ((doneCount / TOTAL_DAYS) * 100).toFixed(1);
+      document.getElementById('header-completed-count').textContent = `${doneCount} / ${TOTAL_DAYS}`;
+      document.getElementById('header-progress-pct').textContent = `${pct}%`;
+    }
+
+    // Modal de Anotações
+    function openNoteModal(iso, label) {
+      activeModalIso = iso;
+      document.getElementById('modal-date-badge').textContent = label;
+      const existing = userState.notes[iso] || { rpe: '', text: '' };
+      document.getElementById('modal-rpe').value = existing.rpe || '';
+      document.getElementById('modal-note-text').value = existing.text || '';
+      const modal = document.getElementById('note-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeNoteModal() {
+      const modal = document.getElementById('note-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      activeModalIso = null;
+    }
+
+    function saveDayNote() {
+      if (!activeModalIso) return;
+      userState.notes[activeModalIso] = {
+        rpe: document.getElementById('modal-rpe').value,
+        text: document.getElementById('modal-note-text').value.trim()
+      };
+      saveState();
+      closeNoteModal();
+      renderWeekView();
+    }
+
+    // =========================================================================
+    // 3. SIMULADOR DE ÍNDICES DO EDITAL (TAF VS. CURSO COT)
+    // =========================================================================
+    const DEFAULT_METRICS = [
+      { id: 'nado_cont', name: 'Natação Contínua (Traje Banho)', unit: 'metros', current: 50, taf: 200, curso: 3000, higherIsBetter: true, info: 'TAF: 200m em 5min | Curso: >3.000m contínuos' },
+      { id: 'apneia', name: 'Apneia Estática (Meta Pessoal 2:30)', unit: 'segundos', current: 35, taf: 60, curso: 150, higherIsBetter: true, info: 'Curso exige >90s (1:30) | Sua meta: 150s (2:30)' },
+      { id: 'corrida_10k_pace', name: 'Pace Confortável nos 10 km', unit: 'seg/km', current: 345, taf: 300, curso: 300, higherIsBetter: false, info: 'Atual est. 10km: ~5:45/km (345s) | Alvo: 5:00/km (300s)' },
+      { id: 'corrida_3k', name: 'Corrida 3.000m (TAF)', unit: 'minutos', current: 14.5, taf: 15.0, curso: 12.0, higherIsBetter: false, info: 'TAF: <= 15:00 min | Curso (3-7km pace 5): <= 15:00 min' },
+      { id: 'marcha', name: 'Marcha Operacional (25 kg)', unit: 'km', current: 4, taf: 0, curso: 16, higherIsBetter: true, info: 'Curso exige >15 km com sobrecarga de ~25 kg' },
+      { id: 'flutuacao', name: 'Flutuação Vertical Fardado', unit: 'minutos', current: 5, taf: 20, curso: 60, higherIsBetter: true, info: 'TAF: 20 min fardado | Curso: 60 min fardado (+10min c/ fuzil)' },
+      { id: 'barra', name: 'Barra Fixa Pronada (Sem Galeio)', unit: 'reps', current: 8, taf: 12, curso: 15, higherIsBetter: true, info: 'Art. 13: 10 reps | Anexo XI: preparar para 12 reps' },
+      { id: 'sustentacao', name: 'Sustentação na Barra', unit: 'segundos', current: 45, taf: 60, curso: 90, higherIsBetter: true, info: 'TAF: mínimo 60 segundos suspenso' },
+      { id: 'flexao', name: 'Flexão no Solo (Peito na Mão)', unit: 'reps', current: 28, taf: 35, curso: 50, higherIsBetter: true, info: 'TAF: 35 repetições ininterruptas' },
+      { id: 'abdominal', name: 'Abdominal Tipo Remador (80s)', unit: 'reps', current: 38, taf: 50, curso: 65, higherIsBetter: true, info: 'TAF: 50 repetições em até 80 segundos' },
+      { id: 'shuttle', name: 'Shuttle Run (Agilidade)', unit: 'segundos', current: 11.8, taf: 11.99, curso: 10.8, higherIsBetter: false, info: 'TAF: máximo 11.99 segundos (sem quicar a madeira)' },
+      { id: 'pista', name: 'Pista de Obstáculos (17 obs + Corda 6m)', unit: 'minutos', current: 6.0, taf: 5.0, curso: 4.2, higherIsBetter: false, info: 'Anexo X: máximo 5:00 min com uniforme e coturno' }
+    ];
+
+    function renderMetrics() {
+      if (!userState.metrics) {
+        userState.metrics = JSON.parse(JSON.stringify(DEFAULT_METRICS));
+      }
+      const container = document.getElementById('metrics-container');
+      container.innerHTML = '';
+
+      userState.metrics.forEach((m, idx) => {
+        let pctCurso = 0;
+        if (m.higherIsBetter) {
+          pctCurso = Math.min(100, Math.max(5, Math.round((m.current / m.curso) * 100)));
+        } else {
+          pctCurso = Math.min(100, Math.max(5, Math.round((m.curso / m.current) * 100)));
+        }
+
+        const tafAtingido = m.taf === 0 ? true : (m.higherIsBetter ? m.current >= m.taf : m.current <= m.taf);
+        const cursoAtingido = m.higherIsBetter ? m.current >= m.curso : m.current <= m.curso;
+
+        const card = document.createElement('div');
+        card.className = "p-4 rounded-xl bg-tactical-850 border border-tactical-700 flex flex-col justify-between gap-3";
+        card.innerHTML = `
+          <div>
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <h4 class="text-sm font-bold text-white">${m.name}</h4>
+                <p class="text-[11px] text-slate-400 mt-0.5">${m.info}</p>
+              </div>
+              <div class="flex gap-1 shrink-0">
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold ${tafAtingido ? 'bg-lime-500/20 text-lime-300 border border-lime-500/40' : 'bg-slate-800 text-slate-400'}">
+                  ${tafAtingido ? '✓ TAF OK' : 'TAF PEND.'}
+                </span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold ${cursoAtingido ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-slate-800 text-slate-400'}">
+                  ${cursoAtingido ? '✓ CURSO OK' : 'EM EVOLUÇÃO'}
+                </span>
+              </div>
+            </div>
+
+            <!-- Barra de Progresso Rumo ao Curso -->
+            <div class="mt-3">
+              <div class="flex justify-between text-[11px] font-mono mb-1">
+                <span class="text-slate-300">Progresso Alvo Curso (${m.curso} ${m.unit})</span>
+                <span class="text-amber-400 font-bold">${pctCurso}%</span>
+              </div>
+              <div class="w-full h-2.5 bg-tactical-950 rounded-full overflow-hidden border border-tactical-800">
+                <div class="h-full bg-gradient-to-r from-lime-500 to-amber-400 transition-all duration-500" style="width: ${pctCurso}%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-2 border-t border-tactical-800">
+            <label class="text-xs text-slate-300 font-medium">Marca Atual (${m.unit}):</label>
+            <input type="number" step="any" value="${m.current}" onchange="updateMetricValue(${idx}, this.value)"
+              class="w-28 bg-tactical-950 border border-tactical-700 rounded-lg px-2.5 py-1 text-right font-mono text-sm font-bold text-white focus:outline-none focus:border-amber-500" />
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function updateMetricValue(idx, val) {
+      const num = parseFloat(val);
+      if (!isNaN(num) && num > 0) {
+        userState.metrics[idx].current = num;
+        saveState();
+        renderMetrics();
+      }
+    }
+
+    function resetMetricsToBaseline() {
+      userState.metrics = JSON.parse(JSON.stringify(DEFAULT_METRICS));
+      saveState();
+      renderMetrics();
+    }
+
+    // =========================================================================
+    // 4. CRONÔMETRO DE APNEIA (CO2 / O2) E FLUTUAÇÃO
+    // =========================================================================
+    const APNEA_TABLES = {
+      co2_iniciante: [
+        { rest: 90, hold: 45 }, { rest: 75, hold: 45 }, { rest: 60, hold: 45 },
+        { rest: 45, hold: 45 }, { rest: 35, hold: 45 }, { rest: 30, hold: 45 }
+      ],
+      co2_inter: [
+        { rest: 90, hold: 75 }, { rest: 75, hold: 75 }, { rest: 60, hold: 75 },
+        { rest: 45, hold: 75 }, { rest: 35, hold: 75 }, { rest: 30, hold: 75 }
+      ],
+      co2_avancado: [
+        { rest: 75, hold: 105 }, { rest: 60, hold: 105 }, { rest: 50, hold: 105 },
+        { rest: 40, hold: 105 }, { rest: 30, hold: 105 }, { rest: 25, hold: 105 }
+      ],
+      o2_pico: [
+        { rest: 90, hold: 75 }, { rest: 90, hold: 95 }, { rest: 90, hold: 115 },
+        { rest: 90, hold: 130 }, { rest: 90, hold: 140 }, { rest: 90, hold: 150 }
+      ]
+    };
+
+    let apneaInterval = null;
+    let apneaRounds = [];
+    let apneaIdx = 0;
+    let apneaPhase = 'rest'; // 'rest' ou 'hold'
+    let apneaSecLeft = 45;
+
+    function formatMMSS(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function playBeep(freq = 600, dur = 0.2) {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + dur);
+        osc.stop(ctx.currentTime + dur);
+      } catch (e) {}
+    }
+
+    function setupApneaProtocol() {
+      pauseApneaTimer();
+      const key = document.getElementById('apnea-protocol').value;
+      apneaRounds = APNEA_TABLES[key];
+      apneaIdx = 0;
+      apneaPhase = 'rest';
+      apneaSecLeft = apneaRounds[0].rest;
+      updateApneaUI();
+    }
+
+    function updateApneaUI() {
+      document.getElementById('apnea-round-badge').textContent = `Série ${apneaIdx + 1} / ${apneaRounds.length}`;
+      document.getElementById('apnea-timer-text').textContent = formatMMSS(apneaSecLeft);
+      const box = document.getElementById('apnea-display-box');
+      const label = document.getElementById('apnea-phase-label');
+      const inst = document.getElementById('apnea-instruction');
+
+      if (apneaPhase === 'rest') {
+        box.className = "my-6 p-6 rounded-2xl bg-tactical-950 border-2 border-sky-500/50 text-center transition-colors";
+        label.className = "text-sm font-mono font-bold uppercase tracking-widest text-sky-400";
+        label.textContent = "FASE 1: RESPIRAÇÃO / PREPARAÇÃO";
+        inst.textContent = "Inspire lento pelo nariz (4s) e expire suave pela boca (8s). Relaxe ombros e mandíbula.";
+      } else {
+        box.className = "my-6 p-6 rounded-2xl bg-amber-950/30 border-2 border-amber-500 text-center transition-colors";
+        label.className = "text-sm font-mono font-bold uppercase tracking-widest text-amber-400";
+        label.textContent = "FASE 2: APNEIA (SEGURE A RESPIRAÇÃO)";
+        inst.textContent = "Mantenha a calma quando surgirem as contrações diafragmáticas. Foco mental!";
+      }
+    }
+
+    function startApneaTimer() {
+      if (apneaInterval) return;
+      playBeep(520, 0.15);
+      apneaInterval = setInterval(() => {
+        apneaSecLeft--;
+        if (apneaSecLeft <= 3 && apneaSecLeft > 0) playBeep(440, 0.1);
+        if (apneaSecLeft <= 0) {
+          if (apneaPhase === 'rest') {
+            apneaPhase = 'hold';
+            apneaSecLeft = apneaRounds[apneaIdx].hold;
+            playBeep(880, 0.35);
+          } else {
+            apneaIdx++;
+            if (apneaIdx >= apneaRounds.length) {
+              pauseApneaTimer();
+              playBeep(1000, 0.5);
+              document.getElementById('apnea-phase-label').textContent = "PROTOCOLO CONCLUÍDO!";
+              document.getElementById('apnea-timer-text').textContent = "00:00";
+              return;
+            }
+            apneaPhase = 'rest';
+            apneaSecLeft = apneaRounds[apneaIdx].rest;
+            playBeep(660, 0.3);
+          }
+        }
+        updateApneaUI();
+      }, 1000);
+    }
+
+    function pauseApneaTimer() {
+      clearInterval(apneaInterval);
+      apneaInterval = null;
+    }
+
+    // Cronômetro Regressivo Rápido (Flutuação / TAF)
+    let quickTotalSec = 1200;
+    let quickSecLeft = 1200;
+    let quickInterval = null;
+
+    function setQuickTimer(sec, label) {
+      pauseQuickTimer();
+      quickTotalSec = sec;
+      quickSecLeft = sec;
+      document.getElementById('quick-timer-label').textContent = label;
+      document.getElementById('quick-timer-text').textContent = formatMMSS(quickSecLeft);
+    }
+
+    function startQuickTimer() {
+      if (quickInterval) return;
+      playBeep(600, 0.15);
+      quickInterval = setInterval(() => {
+        quickSecLeft--;
+        if (quickSecLeft <= 0) {
+          pauseQuickTimer();
+          quickSecLeft = 0;
+          playBeep(950, 0.6);
+        }
+        document.getElementById('quick-timer-text').textContent = formatMMSS(quickSecLeft);
+      }, 1000);
+    }
+
+    function pauseQuickTimer() {
+      clearInterval(quickInterval);
+      quickInterval = null;
+    }
+
+    function resetQuickTimer() {
+      pauseQuickTimer();
+      quickSecLeft = quickTotalSec;
+      document.getElementById('quick-timer-text').textContent = formatMMSS(quickSecLeft);
+    }
+
+    // =========================================================================
+    // 5. GRÁFICOS DE EVOLUÇÃO (CHART.JS)
+    // =========================================================================
+    let chartsRendered = false;
+
+    function renderCharts() {
+      if (chartsRendered) return;
+      chartsRendered = true;
+
+      const weeksLabels = Array.from({ length: 31 }, (_, i) => `S${i + 1}`);
+      const marchaKmData = weeksLabels.map((_, i) => {
+        const w = i + 1;
+        if (w === 31) return 6;
+        return Math.min(18, Math.round(6 + w * 0.43));
+      });
+      const marchaKgData = weeksLabels.map((_, i) => {
+        const w = i + 1;
+        if (w === 31) return 10;
+        return Math.min(25, Math.round(10 + (w / 27) * 15));
+      });
+
+      const nadoDistData = weeksLabels.map((_, i) => {
+        const w = i + 1;
+        if (w === 31) return 1000;
+        return Math.min(2200, Math.round(400 + w * 62));
+      });
+      const apneiaSecData = weeksLabels.map((_, i) => {
+        const w = i + 1;
+        return Math.min(155, Math.round(35 + w * 4));
+      });
+
+      const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { labels: { color: '#cbd5e1', font: { size: 11 } } }
+        },
+        scales: {
+          x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: '#1e252e' } },
+          y: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: '#1e252e' } }
+        }
+      };
+
+      new Chart(document.getElementById('chartMarcha'), {
+        type: 'line',
+        data: {
+          labels: weeksLabels,
+          datasets: [
+            { label: 'Distância Marcha (km)', data: marchaKmData, borderColor: '#fbbf24', backgroundColor: 'rgba(251,191,36,0.15)', tension: 0.3, fill: true },
+            { label: 'Sobrecarga Mochila (kg)', data: marchaKgData, borderColor: '#84cc16', backgroundColor: 'rgba(132,204,22,0.1)', tension: 0.3 }
+          ]
+        },
+        options: commonOptions
+      });
+
+      new Chart(document.getElementById('chartAquatico'), {
+        type: 'line',
+        data: {
+          labels: weeksLabels,
+          datasets: [
+            { label: 'Natação em 40 min (m)', data: nadoDistData, borderColor: '#38bdf8', backgroundColor: 'rgba(56,189,248,0.15)', tension: 0.3, fill: true, yAxisID: 'y' },
+            { label: 'Apneia Estática (seg)', data: apneiaSecData, borderColor: '#f43f5e', tension: 0.3, yAxisID: 'y1' }
+          ]
+        },
+        options: {
+          ...commonOptions,
+          scales: {
+            x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: '#1e252e' } },
+            y: { type: 'linear', position: 'left', ticks: { color: '#38bdf8' }, grid: { color: '#1e252e' } },
+            y1: { type: 'linear', position: 'right', ticks: { color: '#f43f5e' }, grid: { drawOnChartArea: false } }
+          }
+        }
+      });
+    }
+
+    // =========================================================================
+    // 6. NAVEGAÇÃO ENTRE ABAS E INICIALIZAÇÃO
+    // =========================================================================
+    function switchTab(tabName) {
+      const tabs = ['calendario', 'metas', 'cronometro', 'evolucao', 'diretrizes'];
+      tabs.forEach(t => {
+        document.getElementById(`view-${t}`).classList.add('hidden');
+        const btn = document.getElementById(`tab-btn-${t}`);
+        btn.classList.remove('tab-active');
+        btn.classList.add('text-slate-400');
+      });
+
+      document.getElementById(`view-${tabName}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+      activeBtn.classList.add('tab-active');
+      activeBtn.classList.remove('text-slate-400');
+
+      if (tabName === 'evolucao') renderCharts();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initWeekSelector();
+      selectWeek(1); // Começa na Semana 1 (amanhã, 24/11/2026)
+      updateHeaderKPIs();
+      renderMetrics();
+      setupApneaProtocol();
+    });
+  </script>
+</body>
+</html>
